@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('Nash Api:server');
+var debug = require('debug')('NASH:App');
 var http = require('http');
 
 /**
