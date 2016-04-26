@@ -1,4 +1,4 @@
-# Nash-Api
+# Nash Chat Api
 [![Build Status](https://travis-ci.org/dragfire/Nash-Api.svg?branch=master)](https://travis-ci.org/dragfire/Nash-Api)
 
 
