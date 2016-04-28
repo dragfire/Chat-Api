@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-
+var debug = require('debug')('NASH: App');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var register = require('./routes/register');
@@ -54,8 +54,6 @@ app.use('/chat', chat);
 app.use('/login', login);
 app.use('/dashboard', requireLogin, dashboard);
 app.get('/logout', function(req, res){
-    // destroy the user's session to log them out
-    // will be re-created next request
     req.session.destroy(function(){
         res.redirect('/');
     });
@@ -99,6 +97,8 @@ module.exports = app;
 
 
 function requireLogin(req, res, next) {
+    debug(req.session);
+    debug(JSON.stringify(req.session, 0, 2));
     if (req.session.user) {
         next();
     } else {

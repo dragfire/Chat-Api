@@ -15,7 +15,6 @@ router
             if (err) throw err;
 
             if (user) {
-
                 req.session.regenerate(function () {
                     req.session.user = user;
                     req.session.success = 'Authenticated as ' + user.name

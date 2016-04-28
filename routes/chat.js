@@ -13,39 +13,54 @@ router
         res.render('pages/register', {title: 'Register | Nash Chat Api'});
     })
     .post(function (req, res) {
+        debug(req.body, req.session);
         var companyName = req.body.company_name;
-        var username = req.body.username;
-        var message = req.body.message;
-        var ua = req.get('User-Agent');
-        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        if (req.xhr){
+            debug('Ajax Request');
+            schemas.Company.findOne({name: companyName}).exec(function (err, doc) {
+                if(err) throw  err;
+                if(doc){
+                    schemas.Chat.find({company: doc._id}).exec(function (err, docs) {
+                        debug("chats", docs);
+                        res.json(docs);
+                    });
+                }
+            });
+        } else {
+            var username = req.body.username;
+            var message = req.body.message;
+            var ua = req.get('User-Agent');
+            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-        debug(req.body, ua, ip);
-        
-        schemas.Company.findOne({name: companyName}).exec(function (err, doc) {
-            if (err) {
-                throw err;
-            }
-            if (doc) {
-                debug(doc);
-                var chat = new schemas.Chat({
-                    company: doc._id,
-                    message: message,
-                    username: username,
-                    userAgent: ua,
-                    ip: ip,
-                    created: new Date()
-                });
+            debug(req.body, ua, ip);
 
-                chat.save(function (err) {
-                    if (err) throw err;
-                });
-            }
-            // else {
-            //     res.send('No company named '+companyName+ ' found.');
-            // }
-        });
+            schemas.Company.findOne({name: companyName}).exec(function (err, doc) {
+                if (err) {
+                    throw err;
+                }
+                if (doc) {
+                    debug(doc);
+                    var chat = new schemas.Chat({
+                        company: doc._id,
+                        message: message,
+                        username: username,
+                        userAgent: ua,
+                        ip: ip,
+                        created: new Date()
+                    });
 
-        res.send('chat saved');
+                    chat.save(function (err) {
+                        if (err) throw err;
+                    });
+                }
+                // else {
+                //     res.send('No company named '+companyName+ ' found.');
+                // }
+            });
+
+            res.send('chat saved');
+        }
+
     });
 
 module.exports = router;

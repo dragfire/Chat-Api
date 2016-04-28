@@ -7,6 +7,10 @@
             height: 100% !important;
             margin: 0 !important;
         }
+
+        .nashbtn{
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -16,14 +20,14 @@
             <div class="card-panel white accent-3 ">
                 <div class="user">
                     <h5 class="pink-text accent-3">
-                        <i class="material-icons left">perm_identity</i> <span>Nash</span>
+                        <i class="material-icons left">perm_identity</i> <span id="companyName"><%=company%></span>
                     </h5>
                 </div>
             </div>
             <div class="collection">
                 <a href="#!" class="collection-item">Nash<span class="badge">1</span></a>
                 <a href="#!" class="collection-item">Users Online<span class="new badge">4</span></a>
-                <a id="chatbtn" class="collection-item">Chats<span class="badge">25</span></a>
+                <a id="chatbtn" class="collection-item nashbtn">Chats<span class="badge">25</span></a>
                 <a href="#!" class="collection-item">Admins<span class="badge">3</span></a>
             </div>
             <a href="/logout" class="waves-effect waves-light btn-large">Logout</a>
@@ -43,13 +47,26 @@
     //    });
 
     $(function () {
+        var $liveContent = $('.main-wrapper > #content');
+
         $('#chatbtn').click(function () {
+            $liveContent.empty();
+            console.log('Chatbtn clicked');
             $.ajax({
                 type: 'post',
                 dataType: 'json',
-                url: '/api/chat.js'
-                success: function (res) {
-
+                url: '/chat',
+                data: {company_name: $('#companyName').text().toLowerCase()},
+                success: function (data) {
+                    console.log(data);
+                    data.forEach(function (res) {
+                        $liveContent.append("<div class='card-panel'>" +
+                                "<p class='pink-text accent-3'>"+res.username+"</p>" +
+                                "<p class='green-text accent-4'>"+res.message+"</p></div>");
+                    });
+                },
+                error: function (xhr, status, err) {
+                    console.log(err.toString());
                 }
             });
         });
