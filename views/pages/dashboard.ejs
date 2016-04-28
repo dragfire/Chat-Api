@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+    <% include ../partials/head %>
+    <style>
+        html, body, .dashbody, .dashbody > .row, .sidebar, .main-wrapper {
+            height: 100% !important;
+            margin: 0 !important;
+        }
+    </style>
+</head>
+<body>
+<div class="col s12 m12 l12 dashbody">
+    <div class="row">
+        <div class="sidebar col s12 m4 l4 pink accent-4">
+            <div class="card-panel white accent-3 ">
+                <div class="user">
+                    <h5 class="pink-text accent-3">
+                        <i class="material-icons left">perm_identity</i> <span>Nash</span>
+                    </h5>
+                </div>
+            </div>
+            <div class="collection">
+                <a href="#!" class="collection-item">Nash<span class="badge">1</span></a>
+                <a href="#!" class="collection-item">Users Online<span class="new badge">4</span></a>
+                <a id="chatbtn" class="collection-item">Chats<span class="badge">25</span></a>
+                <a href="#!" class="collection-item">Admins<span class="badge">3</span></a>
+            </div>
+            <a href="/logout" class="waves-effect waves-light btn-large">Logout</a>
+
+        </div>
+        <div class="main-wrapper col s12 m8 l8 teal accent-4">
+            <div id="content"></div>
+        </div>
+    </div>
+
+</div>
+</body>
+<% include ../partials/footer %>
+<script>
+    //    $(function () {
+    //       var $companyName = $('#company_name');
+    //    });
+
+    $(function () {
+        $('#chatbtn').click(function () {
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                url: '/api/chat.js'
+                success: function (res) {
+
+                }
+            });
+        });
+    })
+</script>
+</html>

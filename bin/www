@@ -5,6 +5,7 @@
  */
 
 var app = require('../app');
+var mongoose = require('mongoose');
 var debug = require('debug')('NASH:App');
 var http = require('http');
 
@@ -25,7 +26,16 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(port, function () {
+    var db_uri;
+
+    if(app.get('env') == 'development'){
+        db_uri = "mongodb://localhost:27017/api";
+    } else {
+        db_uri= "";
+    }
+    mongoose.connect(db_uri);
+});
 server.on('error', onError);
 server.on('listening', onListening);
 

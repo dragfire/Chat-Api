@@ -4,9 +4,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var register = require('./routes/register');
+var chat = require('./routes/chat');
+var login = require('./routes/login');
+var dashboard = require('./routes/dashboard');
 
 var app = express();
 
@@ -17,13 +22,44 @@ app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(session({
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    secret: 'shhhh, very secret'
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded({ extended: false }));
+
+
+// Session-persisted message middleware
+
+app.use(function(req, res, next){
+    var err = req.session.error;
+    var msg = req.session.success;
+    delete req.session.error;
+    delete req.session.success;
+    res.locals.message = '';
+    if (err) res.locals.message = '<p class="msg error">' + err + '</p>';
+    if (msg) res.locals.message = '<p class="msg success">' + msg + '</p>';
+    next();
+});
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/register', register);
+app.use('/chat', chat);
+app.use('/login', login);
+app.use('/dashboard', requireLogin, dashboard);
+app.get('/logout', function(req, res){
+    // destroy the user's session to log them out
+    // will be re-created next request
+    req.session.destroy(function(){
+        res.redirect('/');
+    });
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -31,6 +67,8 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+
 
 // error handlers
 
@@ -58,3 +96,13 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+
+
+function requireLogin(req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        req.session.error = 'Access denied!';
+        res.redirect('/login');
+    }
+}
