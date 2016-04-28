@@ -60,9 +60,12 @@ window.onload = function () {
     socket.on('message created', function (data) {
         console.log(data);
         var msg = document.createElement('div');
+        var clear = document.createElement('div');
+        clear.setAttribute('class', 'clear');
         msg.setAttribute('class', 'msg sent');
         msg.innerHTML='<p>'+data.username+'</p>'+data.message;
         nashContent.appendChild(msg);
+        nashContent.appendChild(clear);
     });
 };
 
