@@ -22,6 +22,7 @@ exports.Company = mongoose.model('Company', CompanySchema);
 
 var ChatSchema = mongoose.Schema({
     company: {type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true},
+    socketid: String,
     username: String,
     message: String,
     userAgent: String,
