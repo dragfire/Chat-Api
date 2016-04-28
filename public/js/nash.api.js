@@ -45,6 +45,16 @@ window.onload = function () {
     socket.on('admin online', function (data) {
         console.log('Admin is online');
         title.innerHTML+='<p><span style="border: 2px solid green; width: 2px; height: 2px;"></span> '+ data.username +'Admin is online</p>';
+        socket.emit('admin is back', {
+            company: 'hayum',
+            username: 'guest',
+            client: true
+        });
+    });
+    
+    socket.on('admin offline', function (data) {
+        console.log('Admin offline');
+        title.innerHTML+='<p style="color: red;">'+ data.username +'Admin is offline</p>';
     });
 };
 

@@ -20,16 +20,19 @@ function sio(io) {
          */
         socket.on('new user', function (data) {
             debug('new user', data);
-            socket.join(data.company);
+            if (!users.clients[socket.id])
+                socket.join(data.company);
+            if (!users.admins[socket.id])
+                socket.join(data.company);
             if (!data.client) {
                 debug('Admin joined');
-                users.admins[socket.id] = {ua: ua, ip: ip, room: data.company};
+                users.admins[socket.id] = {ua: ua, ip: ip, room: data.company, msgCount: 0};
                 io.in(data.company).emit('admin online', {
                     username: 'hayum'
                 });
             } else {
                 debug('Client joined');
-                users.clients[socket.id] = {ua: ua, ip: ip, room: data.company};
+                users.clients[socket.id] = {ua: ua, ip: ip, room: data.company, msgCount: 0};
                 io.to(data.company).emit('user online', {
                     count: 1
                 });
@@ -65,12 +68,28 @@ function sio(io) {
                 }
             });
             debug('Socket id', socket.id);
+            if(users.clients[socket.id]) {
+                users.clients[socket.id].msgCount += 1;
+            }
             io.sockets.to(socket.id).emit('message created', data);
         });
 
+        socket.on('get inbox', function (data) {
+            socket.emit('inbox', {
+                users: users.clients
+            });
+        });
+
+        socket.on('admin is back', function (data) {
+            debug('Admin is back');
+            io.in(users.clients[socket.id].room).emit('user online', {
+                count: 1
+            });
+        });
+
         socket.on('disconnect', function () {
-            if(users.clients[socket.id]){
-                debug('Client', socket.id,'disconnected', users.clients[socket.id].room);
+            if (users.clients[socket.id]) {
+                debug('Client', socket.id, 'disconnected', users.clients[socket.id].room);
                 //debug(socket);
                 io.in(users.clients[socket.id].room).emit('user offline', {
                     count: 1
@@ -78,10 +97,13 @@ function sio(io) {
                 socket.leave(users.clients[socket.id].room);
                 delete users.clients[socket.id];
             }
-            if(user.admins[socket.id]){
-                debug('Admin', socket.id,'disconnected', users.admins[socket.id].room);
+            if (users.admins[socket.id]) {
+                debug('Admin', socket.id, 'disconnected', users.admins[socket.id].room);
                 //debug(socket);
                 io.in(users.admins[socket.id].room).emit('user offline', {
+                    count: 1
+                });
+                io.to(users.admins[socket.id].room).emit('admin offline', {
                     count: 1
                 });
                 socket.leave(users.admins[socket.id].room);
