@@ -1,6 +1,7 @@
 /**
  * Created by dragfire on 27-04-2016.
  */
+// Client code - Avoid JQuery
 
 // socket
 
