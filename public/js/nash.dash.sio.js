@@ -6,9 +6,10 @@ var socket = io();
 var $userOnlineBadge = $('.new.badge.usersOnline');
 var $inboxBadge = $('.new.badge.inbox');
 var $inbox = $('#inboxbtn');
-var $inboxTableBody = $('.inboxTable > tbody');
+var $content = $('#content');
 var count;
 
+$content.hide();
 socket.emit('new user', {
     username: 'hayum',
     client: false,
@@ -39,14 +40,15 @@ socket.on('inbox', function (data) {
     $.each(data.users, function (socket, details) {
         console.log(socket, details.ip);
         //console.log(socket, details);
-        $inboxTableBody.append("<tr>" +
-            "<td>" + socket + "</td>" +
-            "<td>" + details.ip + "</td>" +
-            "<td>" + details.ua + "</td>" +
-            "</tr>");
+        $content.append(
+            '<div class="user card-panel">' +
+            '<h6>ID: ' + socket + ' IP: ' + details.ip + '</h6>' +
+            '<h6> UA: ' + details.ua.match(/\([a-zA-Z0-9].*/)[0] + '</h6>' +
+            '<span class="new badge">' + details.msgCount + '</span><a class="red-text accent-5 waves-effect waves-teal btn-flat">Start Chat</a>' +
+            '</div>'
+        );
+        $content.show();
     });
-
-    $('.inboxTable').show();
 });
 
 $('.inboxTable > tbody > tr').click(function () {
